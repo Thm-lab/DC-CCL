@@ -66,7 +66,10 @@ if __name__ == '__main__':
     )
     cloud_B_trainer.train()
 
-    central_B_result = get_result(r'./result/central_B.pkl')
+    result_root = r'./result/'
+    central_B_result = get_result(result_root +
+                                  utils.get_variable_name(central_B) + '.pkl')
+    cloud_B_result = get_result(result_root +
+                                utils.get_variable_name(cloud_B) + '.pkl')
     print('vgg_base_model accuracy: ', central_B_result['accs'])
-    cloud_B_result = get_result(r'./result/cloud_B.pkl')
     print('vgg_base_model accuracy: ', cloud_B_result['accs'])

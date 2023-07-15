@@ -143,13 +143,22 @@ if __name__ == '__main__':
     )
     decounpled_model_trainer.train()
 
-    cloud_result = get_result(r'./result/cloud_model.pkl')
-    control_result = get_result(r'./result/control_model.pkl')
-    co_submodel_result = get_result(r'./result/co_submodel.pkl')
-    co_control_model_result = get_result(r'./result/co_control_model.pkl')
-    decounpled_model_result = get_result(r'./result/decounpled_model.pkl')
-    print('cloud_model accuracy: ', cloud_result['accs'])
-    print('control_model accuracy: ', control_result['accs'])
+    result_root = r'./result/'
+    cloud_model_result = get_result(result_root +
+                                    utils.get_variable_name(cloud_model) +
+                                    '.pkl')
+    control_model_result = get_result(result_root +
+                                      utils.get_variable_name(control_model) +
+                                      '.pkl')
+    co_submodel_result = get_result(result_root +
+                                    utils.get_variable_name(co_submodel) +
+                                    '.pkl')
+    co_control_model_result = get_result(
+        result_root + utils.get_variable_name(co_control_model) + '.pkl')
+    decounpled_model_result = get_result(
+        result_root + utils.get_variable_name(decounpled_model) + '.pkl')
+    print('cloud_model accuracy: ', cloud_model_result['accs'])
+    print('control_model accuracy: ', control_model_result['accs'])
     print('co_submodel accuracy: ', co_submodel_result['accs'])
     print('co_control_model accuracy: ', co_control_model_result['accs'])
     print('decounpled_model accuracy: ', decounpled_model_result['accs'])

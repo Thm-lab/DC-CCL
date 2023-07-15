@@ -2,7 +2,6 @@ import os
 import time
 import utils
 import pickle
-import msvcrt
 import datasets
 
 import torch

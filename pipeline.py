@@ -12,6 +12,7 @@ import torchvision.transforms as transforms
 from matplotlib import pyplot as plt
 from torch.utils.data import DataLoader
 from inputimeout import inputimeout, TimeoutOccurred
+from torch.nn.parallel import DistributedDataParallel as DDP
 
 
 class Trainer():
@@ -25,7 +26,9 @@ class Trainer():
                  freeze=True,
                  criterion=nn.CrossEntropyLoss,
                  optimizer=optim.SGD,
-                 scheduler=optim.lr_scheduler.StepLR):
+                 scheduler=optim.lr_scheduler.StepLR,
+                 ddp=False,
+                 local_rank=0):
         self.cfg = cfg
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.shared_encoder = shared_encoder
@@ -36,14 +39,36 @@ class Trainer():
         self.criterion = criterion
         self.optimizer = optimizer
         self.scheduler = scheduler
+        self.ddp = ddp
+        self.local_rank = local_rank
+        if self.ddp == True:
+            torch.cuda.set_device(self.local_rank)
 
     def train(self):
         # cuda
         if self.shared_encoder is not None:
-            self.shared_encoder = self.shared_encoder.to(self.device)
-        self.model = self.model.to(self.device)
+            if self.ddp == True:
+                self.shared_encoder = self.shared_encoder.to(self.local_rank)
+                self.shared_encoder = DDP(self.shared_encoder,
+                                          device_ids=[self.local_rank],
+                                          output_device=self.local_rank)
+            else:
+                self.shared_encoder = self.shared_encoder.to(self.device)
+        if self.ddp == True:
+            self.model = self.model.to(self.local_rank)
+            self.model = DDP(self.model,
+                             device_ids=[self.local_rank],
+                             output_device=self.local_rank)
+        else:
+            self.model = self.model.to(self.device)
         if self.model_ is not None:
-            self.model_ = self.model_.to(self.device)
+            if self.ddp == True:
+                self.model_ = self.model_.to(self.local_rank)
+                self.model_ = DDP(self.model_,
+                                  device_ids=[self.local_rank],
+                                  output_device=self.local_rank)
+            else:
+                self.model_ = self.model_.to(self.device)
         self.criterion = self.criterion().to(self.device)
         # Preparing data
         if 'trainset_root' in self.cfg and self.cfg['trainset_root'] != '':

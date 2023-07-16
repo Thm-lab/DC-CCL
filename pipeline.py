@@ -12,6 +12,7 @@ import torchvision.transforms as transforms
 from matplotlib import pyplot as plt
 from torch.utils.data import DataLoader
 from inputimeout import inputimeout, TimeoutOccurred
+from torch.utils.data.distributed import DistributedSampler
 from torch.nn.parallel import DistributedDataParallel as DDP
 
 
@@ -101,11 +102,20 @@ class Trainer():
             if all(key in self.cfg
                    for key in ['batch_size', 'shuffle', 'num_workers']):
                 print('==> Loading data..')
-                trainset_loader = DataLoader(
-                    trainset,
-                    batch_size=self.cfg['batch_size'],
-                    shuffle=self.cfg['shuffle'],
-                    num_workers=self.cfg['num_workers'])
+                if self.ddp == True:
+                    train_sampler = DistributedSampler(trainset)
+                    trainset_loader = DataLoader(
+                        trainset,
+                        batch_size=self.cfg['batch_size'],
+                        shuffle=self.cfg['shuffle'],
+                        num_workers=self.cfg['num_workers'],
+                        sampler=train_sampler)
+                else:
+                    trainset_loader = DataLoader(
+                        trainset,
+                        batch_size=self.cfg['batch_size'],
+                        shuffle=self.cfg['shuffle'],
+                        num_workers=self.cfg['num_workers'])
                 testset_loader = DataLoader(
                     testset,
                     batch_size=self.cfg['batch_size'],

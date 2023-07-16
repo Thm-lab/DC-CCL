@@ -71,5 +71,5 @@ if __name__ == '__main__':
                                   utils.get_variable_name(central_B) + '.pkl')
     cloud_B_result = get_result(result_root +
                                 utils.get_variable_name(cloud_B) + '.pkl')
-    print('vgg_base_model accuracy: ', central_B_result['accs'])
-    print('vgg_base_model accuracy: ', cloud_B_result['accs'])
+    print('central_B accuracy: ', central_B_result['accs'])
+    print('cloud_B accuracy: ', cloud_B_result['accs'])

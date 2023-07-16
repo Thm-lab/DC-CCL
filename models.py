@@ -29,9 +29,7 @@ class Cloud_model(nn.Module):
             nn.BatchNorm2d(224), nn.ReLU(inplace=True),
             nn.MaxPool2d(kernel_size=2, stride=2), nn.Flatten())
         self.classifier = nn.Sequential(
-            nn.Linear(in_features=8 * 8 * 224, out_features=10, bias=True),
-            # nn.Softmax(dim=-1)
-        )
+            nn.Linear(in_features=8 * 8 * 224, out_features=10, bias=True), )
 
     def forward(self, x):
         y = self.encoder(x)
@@ -54,9 +52,7 @@ class Co_submodel(nn.Module):
                                                         stride=2),
             nn.Flatten())
         self.classifier = nn.Sequential(
-            nn.Linear(in_features=8 * 8 * 32, out_features=10, bias=True),
-            # nn.Softmax(dim=-1)
-        )
+            nn.Linear(in_features=8 * 8 * 32, out_features=10, bias=True), )
 
     def forward(self, x):
         y = self.encoder(x)
@@ -79,9 +75,7 @@ class Control_model(nn.Module):
                                                         stride=2),
             nn.Flatten())
         self.classifier = nn.Sequential(
-            nn.Linear(in_features=8 * 8 * 32, out_features=10, bias=True),
-            # nn.Softmax(dim=-1)
-        )
+            nn.Linear(in_features=8 * 8 * 32, out_features=10, bias=True), )
 
     def forward(self, x):
         y = self.encoder(x)
@@ -112,12 +106,15 @@ class VGG_cloud_model(nn.Module):
         ]
 
         self.encoder = utils.VGGG_make_layers(self.layers)
-        self.classifier = nn.Sequential(nn.Linear(1 * 1 * 448, 1 * 1 * 448),
-                                        nn.ReLU(inplace=True), nn.Dropout(),
-                                        nn.Linear(1 * 1 * 448, 1 * 1 * 448),
-                                        nn.ReLU(inplace=True), nn.Dropout(),
-                                        nn.Linear(1 * 1 * 448, 10),
-                                        nn.Softmax(dim=-1))
+        self.classifier = nn.Sequential(
+            nn.Linear(1 * 1 * 448, 1 * 1 * 448),
+            nn.ReLU(inplace=True),
+            nn.Dropout(),
+            nn.Linear(1 * 1 * 448, 1 * 1 * 448),
+            nn.ReLU(inplace=True),
+            nn.Dropout(),
+            nn.Linear(1 * 1 * 448, 10),
+        )
 
     def forward(self, x):
         y = self.encoder(x)
@@ -135,12 +132,15 @@ class VGG_co_submodel(nn.Module):
         ]
 
         self.encoder = utils.VGGG_make_layers(self.layers)
-        self.classifier = nn.Sequential(nn.Linear(1 * 1 * 64, 1 * 1 * 64),
-                                        nn.ReLU(inplace=True), nn.Dropout(),
-                                        nn.Linear(1 * 1 * 64, 1 * 1 * 64),
-                                        nn.ReLU(inplace=True), nn.Dropout(),
-                                        nn.Linear(1 * 1 * 64, 10),
-                                        nn.Softmax(dim=-1))
+        self.classifier = nn.Sequential(
+            nn.Linear(1 * 1 * 64, 1 * 1 * 64),
+            nn.ReLU(inplace=True),
+            nn.Dropout(),
+            nn.Linear(1 * 1 * 64, 1 * 1 * 64),
+            nn.ReLU(inplace=True),
+            nn.Dropout(),
+            nn.Linear(1 * 1 * 64, 10),
+        )
 
     def forward(self, x):
         y = self.encoder(x)
@@ -158,12 +158,15 @@ class VGG_control_model(nn.Module):
         ]
 
         self.encoder = utils.VGGG_make_layers(self.layers)
-        self.classifier = nn.Sequential(nn.Linear(1 * 1 * 64, 1 * 1 * 64),
-                                        nn.ReLU(inplace=True), nn.Dropout(),
-                                        nn.Linear(1 * 1 * 64, 1 * 1 * 64),
-                                        nn.ReLU(inplace=True), nn.Dropout(),
-                                        nn.Linear(1 * 1 * 64, 10),
-                                        nn.Softmax(dim=-1))
+        self.classifier = nn.Sequential(
+            nn.Linear(1 * 1 * 64, 1 * 1 * 64),
+            nn.ReLU(inplace=True),
+            nn.Dropout(),
+            nn.Linear(1 * 1 * 64, 1 * 1 * 64),
+            nn.ReLU(inplace=True),
+            nn.Dropout(),
+            nn.Linear(1 * 1 * 64, 10),
+        )
 
     def forward(self, x):
         y = self.encoder(x)
@@ -181,12 +184,15 @@ class VGG_base_model(nn.Module):
         ]
 
         self.encoder = self._make_layers()
-        self.classifier = nn.Sequential(nn.Linear(1 * 1 * 512, 4096),
-                                        nn.ReLU(inplace=True), nn.Dropout(0.4),
-                                        nn.Linear(4096, 4096),
-                                        nn.ReLU(inplace=True), nn.Dropout(0.4),
-                                        nn.Linear(4096, 10),
-                                        nn.Softmax(dim=-1))
+        self.classifier = nn.Sequential(
+            nn.Linear(1 * 1 * 512, 4096),
+            nn.ReLU(inplace=True),
+            nn.Dropout(0.4),
+            nn.Linear(4096, 4096),
+            nn.ReLU(inplace=True),
+            nn.Dropout(0.4),
+            nn.Linear(4096, 10),
+        )
 
     def forward(self, x):
         y = self.encoder(x)

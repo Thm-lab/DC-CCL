@@ -8,6 +8,7 @@ import torch
 import torchvision
 import torch.nn as nn
 import torch.optim as optim
+import torch.nn.functional as F
 import torchvision.transforms as transforms
 from matplotlib import pyplot as plt
 from torch.utils.data import DataLoader
@@ -28,6 +29,8 @@ class Trainer():
                  criterion=nn.CrossEntropyLoss,
                  optimizer=optim.SGD,
                  scheduler=optim.lr_scheduler.StepLR,
+                 T=-1,
+                 criterion_=None,
                  ddp=False,
                  local_rank=0):
         self.cfg = cfg
@@ -38,6 +41,8 @@ class Trainer():
         self.mode = mode
         self.freeze = freeze
         self.criterion = criterion
+        self.T = T
+        self.criterion_ = criterion_
         self.optimizer = optimizer
         self.scheduler = scheduler
         self.ddp = ddp
@@ -71,6 +76,8 @@ class Trainer():
             else:
                 self.model_ = self.model_.to(self.device)
         self.criterion = self.criterion().to(self.device)
+        if self.criterion_ is not None:
+            self.criterion_ = self.criterion_().to(self.device)
         # Preparing data
         if 'trainset_root' in self.cfg and self.cfg['trainset_root'] != '':
             print('==> Preparing data..')
@@ -240,8 +247,27 @@ class Trainer():
                             y_ = self.model_(x)
                             y = y.clone() + y_
                         elif self.model_ is not None and self.mode == 'control-train':
-                            label = self.model_(x)
+                            if self.T == -1:
+                                label = self.model_(x)
+                            else:
+                                y = F.log_softmax(y / self.T, dim=1)
+                                y_ = self.model_(x)
+                                ys = F.log_softmax(y / self.T, dim=1)
+                                ys_ = F.log_softmax(y_ / self.T, dim=1)
+                                print('y_', y_.shape, y_)
+                                print('==========================')
+                                print('ys', ys.shape, ys)
+                                print('==========================')
+                                print('ys_', ys_.shape, ys_)
+                                print('==========================')
+                                loss_ = self.criterion_(ys,
+                                                        ys_) * self.T * self.T
+                                print('loss_', loss_)
                         loss = self.criterion(y, label)
+                        if self.T != -1:
+                            loss = loss.clone() * (
+                                1 -
+                                self.cfg['alpha']) + loss_ * self.cfg['alpha']
                         loss.backward()
                         if self.shared_encoder is not None and self.freeze is False:
                             shared_encoder_optimizer.step()

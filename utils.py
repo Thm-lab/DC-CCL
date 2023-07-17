@@ -215,7 +215,7 @@ def spilit():
 
 def mean_std(root):
     print('Compute mean and variance for data.')
-    # return (0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)
+    return (0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)
     dataset = CIFAR10(root=root, transform=transforms.ToTensor())
     train_loader = DataLoader(dataset,
                               batch_size=1,

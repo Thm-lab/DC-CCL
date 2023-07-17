@@ -210,14 +210,6 @@ def spilit():
                                    folder_name)
         print('Copying ' + source_path + ' to ' + target_path)
         shutil.copytree(source_path, target_path)
-    for folder_name in classes[ratio:]:
-        source_path = os.path.join('./data/device-enhanced-samples',
-                                   folder_name)
-        file_names = os.listdir(source_path)
-        selected_files = random.sample(file_names, 500)
-        for file_name in selected_files:
-            file_path = os.path.join(source_path, file_name)
-            os.remove(file_path)
     delete_per_folder = samples_per_class * ratio // (10 - ratio)
     if samples_per_class * ratio % (10 - ratio) != 0:
         delete_per_folder += 1

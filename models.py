@@ -161,10 +161,10 @@ class VGG_control_model(nn.Module):
         self.classifier = nn.Sequential(
             nn.Linear(1 * 1 * 64, 1 * 1 * 64),
             nn.ReLU(inplace=True),
-            nn.Dropout(),
+            # nn.Dropout(),
             nn.Linear(1 * 1 * 64, 1 * 1 * 64),
             nn.ReLU(inplace=True),
-            nn.Dropout(),
+            # nn.Dropout(),
             nn.Linear(1 * 1 * 64, 10),
         )
 

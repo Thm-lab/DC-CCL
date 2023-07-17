@@ -26,7 +26,7 @@ def main(local_rank, node_rank, local_size, world_size):
             'weight_decay': 5e-3,
             'step_size': 5,
             'gamma': 0.4,
-            'epochs': 30,
+            'epochs': 2,
         },
         'decounpled_model_device': {
             'trainset_root': r'./data/data/device-enhanced-samples',
@@ -39,7 +39,7 @@ def main(local_rank, node_rank, local_size, world_size):
             'weight_decay': 5e-3,
             'step_size': 5,
             'gamma': 0.4,
-            'epochs': 30,
+            'epochs': 2,
         }
     }
     rank = local_rank + node_rank * local_size
@@ -61,16 +61,17 @@ def main(local_rank, node_rank, local_size, world_size):
                    utils.get_variable_name(vgg_cloud_model) + '.pth'))
 
     decounpled_model_device = VGG_co_submodel()
-    decounpled_model_device_trainer = Trainer(cfg['decounpled_model_device'],
-                                            shared_encoder=vgg_shared_encoder,
-                                            model=decounpled_model_device,
-                                            model_=vgg_cloud_model,
-                                            mode='co-train',
-                                            freeze=True,
-                                            criterion=nn.CrossEntropyLoss,
-                                            optimizer=optim.SGD,
-                                            ddp=True,
-                                            local_rank=local_rank)
+    decounpled_model_device_trainer = Trainer(
+        cfg['decounpled_model_device'],
+        shared_encoder=vgg_shared_encoder,
+        model=decounpled_model_device,
+        model_=vgg_cloud_model,
+        mode='co-train',
+        freeze=True,
+        criterion=nn.CrossEntropyLoss,
+        optimizer=optim.SGD,
+        ddp=True,
+        local_rank=local_rank)
     decounpled_model_device_trainer.train()
 
 

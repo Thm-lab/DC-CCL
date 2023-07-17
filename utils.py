@@ -1,3 +1,4 @@
+import math
 import random
 import shutil
 import cv2
@@ -188,7 +189,7 @@ def spilit():
         print('Copying ' + source_path + ' to ' + target_path)
         shutil.copytree(source_path, target_path)
 
-    samples_per_class = 125
+    samples_per_class = math.floor((10 - ratio) * 5000 * 0.1 / ratio)
     for folder_name in classes[:ratio]:
         source_path = os.path.join('./data/cloud-samples/', folder_name)
         target_path = os.path.join('./data/device-enhanced-samples/',
@@ -209,13 +210,38 @@ def spilit():
                                    folder_name)
         print('Copying ' + source_path + ' to ' + target_path)
         shutil.copytree(source_path, target_path)
+    for folder_name in classes[ratio:]:
+        source_path = os.path.join('./data/device-enhanced-samples',
+                                   folder_name)
+        file_names = os.listdir(source_path)
+        selected_files = random.sample(file_names, 500)
+        for file_name in selected_files:
+            file_path = os.path.join(source_path, file_name)
+            os.remove(file_path)
+    delete_per_folder = samples_per_class * ratio // (10 - ratio)
+    if samples_per_class * ratio % (10 - ratio) != 0:
+        delete_per_folder += 1
+    files_to_delete = []
+    for folder_name in classes[ratio:]:
+        source_path = os.path.join('./data/device-enhanced-samples',
+                                   folder_name)
+        file_names = os.listdir(source_path)
+        selected_files = random.sample(file_names, delete_per_folder)
+        for file_name in selected_files:
+            file_path = os.path.join(source_path, file_name)
+            files_to_delete.append(file_path)
+    random.shuffle(files_to_delete)
+    for i, file_path in enumerate(files_to_delete):
+        os.remove(file_path)
+        if i >= (samples_per_class * ratio) - 1:
+            break
 
     print('Done!')
 
 
 def mean_std(root):
     print('Compute mean and variance for data.')
-    return (0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)
+    # return (0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)
     dataset = CIFAR10(root=root, transform=transforms.ToTensor())
     train_loader = DataLoader(dataset,
                               batch_size=1,

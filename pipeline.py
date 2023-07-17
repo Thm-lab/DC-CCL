@@ -250,24 +250,15 @@ class Trainer():
                             if self.T == -1:
                                 label = self.model_(x)
                             else:
-                                y = F.log_softmax(y / self.T, dim=1)
                                 y_ = self.model_(x)
                                 ys = F.log_softmax(y / self.T, dim=1)
-                                ys_ = F.log_softmax(y_ / self.T, dim=1)
-                                print('y_', y_.shape, y_)
-                                print('==========================')
-                                print('ys', ys.shape, ys)
-                                print('==========================')
-                                print('ys_', ys_.shape, ys_)
-                                print('==========================')
-                                loss_ = self.criterion_(ys,
-                                                        ys_) * self.T * self.T
-                                print('loss_', loss_)
+                                ys_ = F.softmax(y_ / self.T, dim=1)
+                                loss_ = self.criterion_(ys, ys_)
                         loss = self.criterion(y, label)
                         if self.T != -1:
                             loss = loss.clone() * (
-                                1 -
-                                self.cfg['alpha']) + loss_ * self.cfg['alpha']
+                                1 - self.cfg['alpha']
+                            ) + loss_ * self.cfg['alpha'] * self.T * self.T
                         loss.backward()
                         if self.shared_encoder is not None and self.freeze is False:
                             shared_encoder_optimizer.step()

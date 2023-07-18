@@ -218,3 +218,55 @@ class VGG_base_model(nn.Module):
         layers += [nn.Flatten()]
 
         return nn.Sequential(*layers)
+
+
+class VGG_cloud_high_level_encoder(nn.Module):
+
+    def __init__(self):
+        super(VGG_cloud_high_level_encoder, self).__init__()
+        self.layers = [
+            56, 'M', 112, 112, 'M', 224, 224, 224, 'M', 448, 448, 448, 'M',
+            448, 448, 448, 'M'
+        ]
+
+        self.encoder = utils.VGGG_make_layers(self.layers)
+
+    def forward(self, x):
+        y = self.encoder(x)
+        return y
+
+
+class VGG_co_high_level_encoder(nn.Module):
+
+    def __init__(self):
+        super(VGG_co_high_level_encoder, self).__init__()
+        self.layers = [
+            8, 'M', 16, 16, 'M', 32, 32, 32, 'M', 64, 64, 64, 'M', 64, 64, 64,
+            'M'
+        ]
+
+        self.encoder = utils.VGGG_make_layers(self.layers)
+
+    def forward(self, x):
+        y = self.encoder(x)
+        return y
+
+
+class VGG_co_classifier(nn.Module):
+
+    def __init__(self):
+        super(VGG_co_classifier, self).__init__()
+
+        self.classifier = nn.Sequential(
+            nn.Linear(1 * 1 * 64, 1 * 1 * 64),
+            nn.ReLU(inplace=True),
+            # nn.Dropout(),
+            nn.Linear(1 * 1 * 64, 1 * 1 * 64),
+            nn.ReLU(inplace=True),
+            # nn.Dropout(),
+            nn.Linear(1 * 1 * 64, 10),
+        )
+
+    def forward(self, x):
+        y = self.classifier(x)
+        return y

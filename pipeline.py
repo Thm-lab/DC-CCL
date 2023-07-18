@@ -27,6 +27,7 @@ class Trainer():
                  model_=None,
                  mode='co-train',
                  freeze=True,
+                 high_level_freeze=True,
                  criterion=nn.CrossEntropyLoss,
                  optimizer=optim.SGD,
                  scheduler=optim.lr_scheduler.StepLR,
@@ -42,6 +43,7 @@ class Trainer():
         self.model_ = model_
         self.mode = mode
         self.freeze = freeze
+        self.high_level_freeze = high_level_freeze
         self.criterion = criterion
         self.T = T
         self.criterion_ = criterion_
@@ -154,7 +156,7 @@ class Trainer():
                         lr=self.cfg['learning_rate'],
                         momentum=self.cfg['momentum'],
                         weight_decay=self.cfg['weight_decay'])
-                if self.high_level_encoder is not None and self.freeze is False and self.optimizer == optim.SGD:
+                if self.high_level_encoder is not None and self.high_level_freeze is False and self.optimizer == optim.SGD:
                     high_level_encoder_optimizer = self.optimizer(
                         self.high_level_encoder.parameters(),
                         lr=self.cfg['learning_rate'],
@@ -185,7 +187,7 @@ class Trainer():
                         step_size=self.cfg['step_size'],
                         gamma=self.cfg['gamma'],
                         last_epoch=-1)
-                if self.high_level_encoder is not None and self.freeze is False:
+                if self.high_level_encoder is not None and self.high_level_freeze is False:
                     high_level_encoder_scheduler = self.scheduler(
                         optimizer=high_level_encoder_optimizer,
                         step_size=self.cfg['step_size'],
@@ -216,7 +218,7 @@ class Trainer():
             if self.shared_encoder is not None and self.freeze is False:
                 print(utils.get_variable_name(shared_encoder_optimizer) + ':')
                 print(shared_encoder_optimizer)
-            if self.high_level_encoder is not None and self.freeze is False:
+            if self.high_level_encoder is not None and self.high_level_freeze is False:
                 print(
                     utils.get_variable_name(high_level_encoder_optimizer) +
                     ':')
@@ -229,7 +231,7 @@ class Trainer():
                     'StepLR (\nParameter Group 0\n    step_size: {step_size}\n    gamma: {gamma}\n)'
                     .format(step_size=self.cfg['step_size'],
                             gamma=self.cfg['gamma']))
-            if self.high_level_encoder is not None and self.freeze is False:
+            if self.high_level_encoder is not None and self.high_level_freeze is False:
                 print(
                     utils.get_variable_name(high_level_encoder_scheduler) +
                     ':')
@@ -275,7 +277,7 @@ class Trainer():
                         for name, param in self.shared_encoder.named_parameters(
                         ):
                             param.requires_grad = False
-                    if self.high_level_encoder is not None and self.freeze is True:
+                    if self.high_level_encoder is not None and self.high_level_freeze is True:
                         for name, param in self.high_level_encoder.named_parameters(
                         ):
                             param.requires_grad = False
@@ -286,7 +288,7 @@ class Trainer():
                         x, label = x.to(self.device), label.to(self.device)
                         if self.shared_encoder is not None and self.freeze is False:
                             shared_encoder_optimizer.zero_grad()
-                        if self.high_level_encoder is not None and self.freeze is False:
+                        if self.high_level_encoder is not None and self.high_level_freeze is False:
                             high_level_encoder_optimizer.zero_grad()
                         model_optimizer.zero_grad()
                         if self.shared_encoder is not None:
@@ -313,7 +315,7 @@ class Trainer():
                         loss.backward()
                         if self.shared_encoder is not None and self.freeze is False:
                             shared_encoder_optimizer.step()
-                        if self.high_level_encoder is not None and self.freeze is False:
+                        if self.high_level_encoder is not None and self.high_level_freeze is False:
                             high_level_encoder_optimizer.step()
                         model_optimizer.step()
                         train_loss += loss.item()
@@ -336,7 +338,7 @@ class Trainer():
                                   (train_loss / (batch_idx + 1), total))
                     if self.shared_encoder is not None and self.freeze is False:
                         shared_encoder_scheduler.step()
-                    if self.high_level_encoder is not None and self.freeze is False:
+                    if self.high_level_encoder is not None and self.high_level_freeze is False:
                         high_level_encoder_scheduler.step()
                     model_scheduler.step()
                     # Testing
@@ -417,7 +419,7 @@ class Trainer():
                         utils.get_variable_name(self.shared_encoder) +
                         ' parameters saved to ./checkpoint/' +
                         utils.get_variable_name(self.shared_encoder) + '.pth')
-                if self.high_level_encoder is not None and self.freeze is False:
+                if self.high_level_encoder is not None and self.high_level_freeze is False:
                     torch.save(
                         self.high_level_encoder.state_dict(), './checkpoint/' +
                         utils.get_variable_name(self.high_level_encoder) +

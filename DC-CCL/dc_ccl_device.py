@@ -24,8 +24,8 @@ def main(local_rank, node_rank, local_size, world_size):
             'learning_rate': 0.01,
             'momentum': 0.9,
             'weight_decay': 0,
-            'step_size': 1,
-            'gamma': 0.2,
+            'step_size': 2,
+            'gamma': 0.5,
             'epochs': 2,
         },
         'dc_ccl_device': {
@@ -37,9 +37,9 @@ def main(local_rank, node_rank, local_size, world_size):
             'learning_rate': 0.01,
             'momentum': 0.9,
             'weight_decay': 0,
-            'step_size': 1,
-            'gamma': 0.2,
-            'epochs': 8,
+            'step_size': 2,
+            'gamma': 0.5,
+            'epochs': 2,
         }
     }
     rank = local_rank + node_rank * local_size
@@ -52,7 +52,7 @@ def main(local_rank, node_rank, local_size, world_size):
                                          world_size=world_size)
 
     vgg_shared_encoder = VGG_shared_encoder()
-    vgg_control_model_mse = VGG_cloud_model()
+    vgg_control_model_mse = VGG_co_submodel()
     vgg_shared_encoder.load_state_dict(
         torch.load(r'./checkpoint/' +
                    utils.get_variable_name(vgg_shared_encoder) + '.pth'))

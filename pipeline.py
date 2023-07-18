@@ -128,9 +128,8 @@ class Trainer():
                     trainset_loader = DataLoader(
                         trainset,
                         batch_size=self.cfg['batch_size'],
-                        shuffle=self.cfg['shuffle'],
-                        num_workers=self.cfg['num_workers'],
-                        sampler=train_sampler)
+                        # sampler=train_sampler
+                    )
                 else:
                     trainset_loader = DataLoader(
                         trainset,
@@ -294,7 +293,10 @@ class Trainer():
                         if self.shared_encoder is not None:
                             x = self.shared_encoder(x)
                         if self.high_level_encoder is not None:
-                            x = self.high_level_encoder(x)
+                            x_ = self.high_level_encoder(x)
+                            y = self.model(x_)
+                        else:
+                            y = self.model(x)
                         y = self.model(x)
                         if self.model_ is not None and self.mode == 'co-train':
                             y_ = self.model_(x)
@@ -358,8 +360,10 @@ class Trainer():
                             if self.shared_encoder is not None:
                                 x = self.shared_encoder(x)
                             if self.high_level_encoder is not None:
-                                x = self.high_level_encoder(x)
-                            y = self.model(x)
+                                x_ = self.high_level_encoder(x)
+                                y = self.model(x_)
+                            else:
+                                y = self.model(x)
                             if self.model_ is not None and self.mode == 'co-train':
                                 y_ = self.model_(x)
                                 y = y.clone() + y_

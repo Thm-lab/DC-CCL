@@ -297,7 +297,6 @@ class Trainer():
                             y = self.model(x_)
                         else:
                             y = self.model(x)
-                        y = self.model(x)
                         if self.model_ is not None and self.mode == 'co-train':
                             y_ = self.model_(x)
                             y = y.clone() + y_
